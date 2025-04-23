@@ -103,10 +103,10 @@ When("I fill in the property details in the panel with:", async function (dataTa
 		if (tagName === "SELECT") {
 			await fieldLocator.selectOption(value);
 		} else if (tagName === "INPUT" || tagName === "TEXTAREA") {
-			if (inputType === "file") {
+			if (inputType === "file" && value != "") {
 				// Handle file upload
 				await fieldLocator.setInputFiles([value]); // value should be the file path
-			} else {
+			} else if (value != "") {
 				await fieldLocator.fill(value);
 			}
 		} else {
