@@ -177,65 +177,17 @@ Then("the new property {string} should appear in the property list", async funct
 });
 
 
-Then("I should see a validation error message for the {string} field", async function (fieldName: string) {
+Then("I should see a validation error message matching {string}", async function (text: string) {
     const page = customWorld.page;
     if (!page) {
       throw new Error("Page object is not available in customWorld.");
     }
+	const panelLocator = page.locator('.property-creation-panel');
 
-    // 1. Get the locator for the specific input field using your existing helper
-    // const fieldInputLocator = getPropertyPanelFieldLocator(page, fieldName);
-
-    // 2. Find the error message element immediately following the input field
-    // Based on the screenshot, it's likely a sibling element containing the error text.
-    // We can search for a text element that is a sibling and contains text related to the field name or "required".
-
-    // --- CUSTOMIZATION REQUIRED HERE (Refine the selector based on actual HTML) ---
-    // Common pattern: Find a sibling element that has error text.
-    // Example 1: Find the next sibling element containing the error text
-    // let errorMessageLocator = page.locator('+ *:text("required", { exact: false })'); // Find immediate sibling with "required" text
-
-    // Example 2: Find any following sibling containing error text (more general)
-    // errorMessageLocator = fieldInputLocator.locator('xpath=./following-sibling::*[contains(text(), "required") or contains(text(), "more than")]'); // Look for text like "required" or "more than"
-
-    // Example 3: More robust - Find a sibling element by a common error class (if your app uses one)
-    // Inspect the HTML of the error message to see if it has a class like 'error-text', 'validation-error', etc.
-    //  let errorMessageLocator = fieldInputLocator.locator('xpath=./following-sibling::*[contains(@class, "error-message")]'); // **Replace .error-message with the actual class name if it exists**
-
-    // Example 4: If the error text is always exactly like "*Field Name is required"
-    // const expectedText = `*${fieldName} is required`; // Adjust based on the exact error pattern
-	// Try to find a sibling element of the input field that contains error keywords
-	// let errorMessageLocator = page.locator('xpath=following-sibling::*[contains(text(), "required") or contains(text(), "more than") or starts-with(normalize-space(text()), "*")]').first();
+	const errorMessageLocator = panelLocator.locator('.text-red-500.text-xs', { hasText: text , });
 	// console.log(`Error message locator: ${errorMessageLocator}`);
-    // Let's try a common approach: find the input, then look for a sibling containing relevant text (like "required", "more than", or part of the field name)
-    // We'll look for a sibling element that contains text related to the field name or indicates an error.
-	// Removed .as('input') as Locator does not have this method
-	// errorMessageLocator = page.locator(`
-	// 	${getPropertyPanelFieldLocator(page, fieldName)} + * :text("${fieldName}", { exact: false }),
-	// 	${getPropertyPanelFieldLocator(page, fieldName)} + * :text("required", { exact: false }),
-	// 	${getPropertyPanelFieldLocator(page, fieldName)} + * :text("more than", { exact: false })
-	// `).first(); // Use first() as multiple matches might occur
+	await expect(errorMessageLocator).toBeVisible();
 
-    // A simpler, often effective approach: Look for text near the input
-    // Find the input, then look for any text node or element nearby with error text.
-    // This uses a relative locator which is powerful.
-    //  errorMessageLocator = page.locator('input').filter({ has: page.getByPlaceholder(fieldName, { exact: false }) || page.getByLabel(fieldName, { exact: false }) || page.locator(`:text("${fieldName}")`) }) // Find the input related to the field name
-    //                      .locator('xpath=./following-sibling::*[contains(text(), "required") or contains(text(), "more than") or starts-with(text(), "*")]').first(); // Look for the next sibling with required/more than/asterisk text
-
-    // --- END OF CUSTOMIZATION REQUIRED ---
-
-
-    // 3. Assert that the found error message element is visible
-    // if (!errorMessageLocator || await errorMessageLocator.count() === 0) {
-    //      throw new Error(`Could not find a validation error message element for field: "${fieldName}". Check the selector logic in the step definition.`);
-    // }
-
-    // await expect(errorMessageLocator).toBeVisible();
-    // console.log(`Validation error message for "${fieldName}" is visible.`);
-
-    // Optional: Verify the text content if you need to be more precise
-    // For "*Name is required": expect(await errorMessageLocator.textContent()).toContain('is required');
-    // For "*Size required more than zero": expect(await errorMessageLocator.textContent()).toContain('required more than');
 });
 
 
